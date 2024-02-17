@@ -1,12 +1,28 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Header from "./Header";
+import { checkValidData } from "../utils/validate";
 
 const Login = () => {
 
-const [isSignedIn,setIsSignedIn]=useState(true);
-    const handleSignIn=()=>{
-           setIsSignedIn(!isSignedIn);
+    const email=useRef(null)
+    const password=useRef(null)
+    const name=useRef(null)
+
+    const [isValidMessage,setIsValidMessage]=useState(null)
+
+    const [isSignedIn, setIsSignedIn] = useState(true);
+    const handleSignIn = () => {
+    setIsSignedIn(!isSignedIn);
+    };
+
+    const handleClickButton=()=>{
+        const message=checkValidData(email.current.value,password.current.value);
+        setIsValidMessage(message)
+
+        console.log(name)
+        // console.log(password.current.value)
     }
+
   return (
     <div className="">
       <Header />
@@ -18,33 +34,54 @@ const [isSignedIn,setIsSignedIn]=useState(true);
         />
       </div>
 
-      <form className=" absolute my-36 mx-auto px-12 py-14 left-0 right-0 w-3/12  bg-black text-white rounded-lg bg-opacity-75 ">
-        <h1 className="font-bold text-2xl p-2 "> {isSignedIn?"Log In" : "Sign Up"}</h1>
-        {!isSignedIn && <input
-          className="p-2 my-2 w-full rounded-lg text-black bg-gray-300"
-          type="text "
-          placeholder="Name"
-        />}
-        {!isSignedIn && <input
-          className="p-2 my-2 w-full rounded-lg text-black bg-gray-300"
-          type="text "
-          placeholder="Phone/Mobile no."
-        />}
-        
+      <form
+        onSubmit={(e) => e.preventDefault()}
+        className=" absolute my-36 mx-auto px-12 py-14 left-0 right-0 w-3/12  bg-black text-white rounded-lg bg-opacity-75 "
+      >
+        <h1 className="font-bold text-2xl p-2 ">
+          {isSignedIn ? "Log In" : "Sign Up"}
+        </h1>
+
+        {!isSignedIn && (
+          <input
+           ref={name}
+            className="p-2 my-2 w-full rounded-lg text-black bg-gray-300"
+            type="text "
+            placeholder="Name"
+          />
+        )}
+        {!isSignedIn && (
+          <input
+            className="p-2 my-2 w-full rounded-lg text-black bg-gray-300"
+            type="text "
+            placeholder="Phone/Mobile no."
+          />
+        )}
+
         <input
+          ref={email}
           className="p-2 my-2 w-full rounded-lg text-black bg-gray-300"
-          type="text "
+          type="email"
           placeholder="Email Address"
         />
-        
+
         <input
+          ref={password}
           className="p-2 my-2  w-full rounded-lg  text-black bg-gray-300"
-          type="password "
+          type="password"
           placeholder="Password"
         />
-        
-        <button className="p-2 my-4  w-full rounded-lg bg-red-600">{isSignedIn?"Log In":"Sign Up"}</button>
-        <p className="cursor-pointer" onClick={handleSignIn}>{isSignedIn?"New to Netflix? Sign up now.":"Already Signed Up, Login Now."}</p>
+        <p className="text-red-600">{isValidMessage}</p>
+
+        <button  onClick={handleClickButton} className="p-2 my-4  w-full rounded-lg bg-red-600">
+          {isSignedIn ? "Log In" : "Sign Up"}
+        </button>
+
+        <p className="cursor-pointer" onClick={handleSignIn}>
+          {isSignedIn
+            ? "New to Netflix? Sign up now."
+            : "Already Signed Up, Login Now."}
+        </p>
       </form>
     </div>
   );
