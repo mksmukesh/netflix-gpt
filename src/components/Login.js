@@ -1,27 +1,69 @@
 import React, { useRef, useState } from "react";
 import Header from "./Header";
 import { checkValidData } from "../utils/validate";
+import { auth } from "../utils/firebase";
+import { createUserWithEmailAndPassword ,signInWithEmailAndPassword} from "firebase/auth";
 
 const Login = () => {
+  const email = useRef(null);
+  const password = useRef(null);
+  const name = useRef(null);
 
-    const email=useRef(null)
-    const password=useRef(null)
-    const name=useRef(null)
+  const [isValidMessage, setIsValidMessage] = useState(null);
 
-    const [isValidMessage,setIsValidMessage]=useState(null)
-
-    const [isSignedIn, setIsSignedIn] = useState(true);
-    const handleSignIn = () => {
+  const [isSignedIn, setIsSignedIn] = useState(true);
+  const handleSignIn = () => {
     setIsSignedIn(!isSignedIn);
-    };
+  };
 
-    const handleClickButton=()=>{
-        const message=checkValidData(email.current.value,password.current.value);
-        setIsValidMessage(message)
+  const handleClickButton = () => {
+    const message = checkValidData(email.current.value, password.current.value);
+    setIsValidMessage(message);
 
-        console.log(name)
-        // console.log(password.current.value)
-    }
+    console.log(message);
+    // console.log(password.current.value)
+
+    if (message) return;
+
+    if(!isSignedIn){
+        //sign UP logic
+    createUserWithEmailAndPassword(
+      auth,
+      email.current.value,
+      password.current.value
+    )
+      .then((userCredential) => {
+        // Signed up
+        const user = userCredential.user;
+        console.log(user);
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        setIsValidMessage(errorCode + "-" + errorMessage);
+        // ..
+      })
+  }
+  else{
+    signInWithEmailAndPassword(auth,email.current.value, password.current.value)
+  .then((userCredential) => {
+    // Signed in 
+    const user = userCredential.user;
+    console.log(user)
+    // ...
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    console.log(errorCode+"-"+errorMessage)
+  });
+
+
+
+
+  }}
+
 
   return (
     <div className="">
@@ -44,7 +86,7 @@ const Login = () => {
 
         {!isSignedIn && (
           <input
-           ref={name}
+            ref={name}
             className="p-2 my-2 w-full rounded-lg text-black bg-gray-300"
             type="text "
             placeholder="Name"
@@ -73,7 +115,10 @@ const Login = () => {
         />
         <p className="text-red-600">{isValidMessage}</p>
 
-        <button  onClick={handleClickButton} className="p-2 my-4  w-full rounded-lg bg-red-600">
+        <button
+          onClick={handleClickButton}
+          className="p-2 my-4  w-full rounded-lg bg-red-600"
+        >
           {isSignedIn ? "Log In" : "Sign Up"}
         </button>
 
